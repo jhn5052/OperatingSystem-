@@ -1,0 +1,57 @@
+#include<pthread.h>
+#include<sys/time.h>
+#include<sys/signal.h>
+#include<utime.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<signal.h>
+
+static void timer_handler(int);
+
+time_t t;
+pthread_t pthread;
+pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+int ticks = 0;
+
+
+//time-triggered thread
+
+void *Time_Triggered() {
+  while (pthread_cond_wait(&cond, &mutex)==0) {
+          time(&t);
+          printf("current time : %s", ctime(&t)); //print current time
+  }
+  pthread_exit((void*)0);
+
+}
+
+
+//timer_handler
+void timer_handler(int signo) {
+    ticks++;
+    if (ticks % 100 == 0) { 
+        ticks = 0;
+        pthread_cond_signal(&cond); //wake up the time triggered thread
+     }
+    signal(SIGALRM, timer_handler); //set SIGALRM handler again 
+}
+
+int main() {
+    struct itimerval delay;
+    int rc;
+    rc = pthread_create(&pthread, NULL, Time_Triggered, NULL);//make time triggered thread
+    signal(SIGALRM,timer_handler);//set SIGALRM
+    //Create an itimer(tick = 10msec)
+    delay.it_value.tv_sec = 0;
+    delay.it_value.tv_usec = 10000;
+    delay.it_interval.tv_sec=0;
+    delay.it_interval.tv_usec = 10000;
+
+    setitimer(ITIMER_REAL, &delay, NULL);
+    while(1){ 
+        pause();
+    }
+    pthread_exit((void*)0);
+}
