@@ -1,0 +1,87 @@
+#include<sys/time.h>
+#include<sys/signal.h>
+#include<utime.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<signal.h>
+#include"API_thread.h"
+
+#define NUM_THREADS 10
+
+static void timer_handler(int);
+
+int num;
+
+//time-triggered thread
+void *Time_Trigger(int k) {
+  time_t t;
+  tt_thread_register((k+1)*1000, k);
+  while(tt_thread_wait_invocation(k) == 0){
+      time(&t);
+      if(k % 3 == 0){
+          printf("[PROCESS %d] current time : %s",k, ctime(&t));
+      }
+      else if(k % 3 == 1){
+          printf("[PROCESS %d] current time : %s",k, ctime(&t));
+      }
+      else if(k % 3 == 2){
+          printf("[PROCESS %d] current time : %s",k, ctime(&t));
+      }
+  }
+  pthread_exit((void*)0);
+
+}
+
+
+//timer_handler
+void timer_handler(int signo) {
+    int i;
+    pthread_mutex_lock(&API_Mutex);
+    for(i = 0 ; i < num ; i++){
+        if((TCB_array[i].time_left_to_invoke -= 10) <= 0){
+            TCB_array[i].time_left_to_invoke = TCB_array[i].period;
+            pthread_cond_signal(&cond_array[i]); //wake up the time triggered thread
+        }
+    }
+    pthread_mutex_unlock(&API_Mutex);
+}
+
+int main() {
+    pthread_t thread;
+    struct itimerval delay;
+    int rc,i;
+
+    signal(SIGALRM,timer_handler);
+
+    printf("The number of Thread(Max 10)");
+    scanf("%d", &num);
+    
+    if(num > NUM_THREADS){
+        perror("OVER TEN THREADS");
+        exit(-1);
+    }
+
+    for(i = 0 ; i < num ; i++){
+        pthread_mutex_init(&API_Mutex,NULL);
+        pthread_cond_init(&cond_array[i],NULL);
+    }
+
+    for(i = 0 ; i < num ; i++){
+        rc = pthread_create(&thread, NULL, Time_Trigger, i);//make time triggered thread
+    }
+
+    //Create an itimer(tick = 10msec)
+    delay.it_value.tv_sec = 0;
+    delay.it_value.tv_usec = 10000;
+    delay.it_interval.tv_sec=0;
+    delay.it_interval.tv_usec = 10000;
+
+    setitimer(ITIMER_REAL, &delay, NULL);
+    
+    while(1){ 
+        pause();
+    }
+
+    pthread_exit((void*)0);
+}
