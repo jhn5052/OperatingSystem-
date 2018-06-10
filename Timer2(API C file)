@@ -1,0 +1,18 @@
+#include "API_thread.h"
+
+void tt_thread_register(int period, int thread_id){
+    pthread_mutex_lock(&API_Mutex);
+    TCB_array[thread_id].period = period;
+    TCB_array[thread_id].thread_id = thread_id;
+    TCB_array[thread_id].time_left_to_invoke = period;
+    pthread_mutex_unlock(&API_Mutex);
+}
+
+int tt_thread_wait_invocation(int thread_id){
+    int ret;
+    pthread_mutex_lock(&API_Mutex);
+    ret = pthread_cond_wait(&cond_array[thread_id],&API_Mutex);
+    pthread_mutex_unlock(&API_Mutex);
+    return ret;
+}
+
