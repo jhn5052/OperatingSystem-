@@ -1,0 +1,97 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+int Coin[10001];
+int C[10001];
+int Change;
+int CoinNum;
+int CoinCnt = 0;
+
+int DPCoinChange() {
+
+	for (int i = 1; i <= Change; i++) {
+		C[i] = 999999; //Max
+	}
+	C[0] = 0;
+
+	for (int i = 1; i <= Change; i++) { 
+		for (int j = 1; j <= CoinNum; j++) { 
+			if ((Coin[j] <= i) && (C[i-Coin[j]]+1 < C[i])) { 
+				C[i] = C[i-Coin[j]] + 1;
+			}
+		}
+	}
+	return C[Change];
+}
+
+
+int main() {
+	int result;
+	int count=0;
+	printf("Coin Type : ");
+	scanf("%d", &CoinNum);
+
+	printf("Coin Price (descending) : ");
+	for (int i = 1; i <= CoinNum; i++) { 
+		scanf("%d", &Coin[i]);
+	}
+
+	printf("Change :");
+	scanf("%d", &Change);	
+
+	result = DPCoinChange();
+
+	if (Change >= 20) {
+		int line = Change;
+		while (line >= 0) {
+			line = line - 20;
+			count++;
+		}
+	}
+	
+
+	int i = 1, k = 1, j = 1;
+	while(count != 0) {
+		count--;
+		if (count < 0) {Ʈ
+			break;
+		}
+		printf("\n\nj = ");
+		while (1) {
+			printf(" %d ", i);
+			if (i >= Change) {
+				break;
+			}
+			else if (i % 20 == 0) {
+				break;
+			}
+			i++;
+		}
+		i++;
+    
+		printf("\nC = ");
+		while(1){
+			if (j >= 10) {
+				printf("  %d ", C[k]);
+			}
+			else {
+				printf(" %d ", C[k]);
+			}			
+			if (k >= Change) {
+				break;
+			}
+			else if (k % 20 == 0) {
+				break;
+			}
+			k++;
+			j++;
+		}
+		k++;
+		j++;
+	}
+
+
+	printf("\n\nresult = %d", result);
+	return 0;
+
+}
