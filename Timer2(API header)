@@ -1,0 +1,18 @@
+#include<pthread.h>
+#define NUM_THREADS 10
+
+pthread_mutex_t API_Mutex;
+pthread_cond_t cond_array[NUM_THREADS];
+
+struct TCB{
+    int period;
+    int thread_id;
+    int time_left_to_invoke;
+};
+typedef struct TCB TCB;
+
+TCB TCB_array[NUM_THREADS];
+
+void tt_thread_register(int period, int thread_id);
+int tt_thread_wait_invocation(int thread_id);
+
