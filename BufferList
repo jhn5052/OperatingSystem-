@@ -1,0 +1,97 @@
+#include<stdio.h>
+#include<pthread.h>
+#include<stdlib.h>
+#include<string.h>
+
+
+typedef struct Node{
+    int data;
+    struct Node *next;
+}Node;
+
+typedef struct Queue{
+    Node *front;
+    Node *rear;
+    int count;
+}Queue;
+
+void *producer(Queue *);
+void *consumer(Queue *);
+void InitQueue(Queue *);
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t buffer_has_space = PTHREAD_COND_INITIALIZER;
+pthread_cond_t buffer_has_data = PTHREAD_COND_INITIALIZER;
+
+int main(){
+    int i;
+    Queue queue;
+    InitQueue(&queue);
+    
+    pthread_t threads[2];
+    pthread_create(&threads[0],NULL,(void*)producer,&queue);
+    pthread_create(&threads[1],NULL,(void*)consumer,&queue);
+    for(i=0;i<2;i++){
+        pthread_join(threads[i],NULL);
+    }
+    return 0;
+}
+
+void InitQueue(Queue *queue){
+    queue->front = queue->rear = NULL;
+    queue->count = 0;
+}
+
+void *producer(Queue *queue){
+    int i;
+    for(i=0;i<1000;i++){
+        Node *node = (Node*)malloc(sizeof(Node));
+        pthread_mutex_lock(&mutex);
+        node->data = i;
+        node->next = NULL;
+        if(queue->count==0){
+            queue->front = node;
+        }
+
+        else{
+        
+            if((queue->count) == 100){    
+                pthread_cond_wait(&buffer_has_space,&mutex);
+            }
+            queue->rear->next = node;
+        }
+
+        queue->rear = node;
+        queue->rear->next = queue->front;
+        
+        queue->count+=1;
+
+        pthread_cond_signal(&buffer_has_data);
+        pthread_mutex_unlock(&mutex);
+    }
+}
+  
+
+void *consumer(Queue *queue){
+    int i,data;
+    
+    for(i=0;i<1000;i++){
+        pthread_mutex_lock(&mutex);
+       
+        if(queue->count == 0){
+            pthread_cond_wait(&buffer_has_data,&mutex);
+        }
+        
+        Node *node = queue->front;
+        data = node->data;
+        queue->front = queue->front->next;
+        queue->rear->next = queue->front;
+
+       
+        queue->count--;
+        pthread_cond_signal(&buffer_has_space);
+        pthread_mutex_unlock(&mutex);
+        printf("data = %d\n",data);
+       
+    }
+}
