@@ -1,0 +1,61 @@
+package day17;
+
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.swing.JOptionPane;
+
+public class Quiz01 {
+	public static void main(String[] args) {
+		TreeMap<String, String> tm;
+		tm = new TreeMap<String, String>();
+		String word; 
+		String mean; 
+		String select;
+		String menu = "1. save word \n"
+					+ "2. search word\n"
+					+ "3. all word \n"
+					+ "4. QUIZ \n"
+					+ "5. exit";
+		while(true) {
+			select = JOptionPane.showInputDialog(menu); 
+			if(select.equals("1")) { //save word
+				word = JOptionPane.showInputDialog("word");
+				mean = JOptionPane.showInputDialog("mean");
+				tm.put(word, mean); 
+			} else if(select.equals("2")) { // search word
+				word = JOptionPane.showInputDialog("search word");
+				if(tm.containsKey(word)) {
+					JOptionPane.showMessageDialog(null, "뜻 : " + tm.get(word));
+				} else {
+					JOptionPane.showMessageDialog(null, "no data");
+				}
+			} else if(select.equals("3")) { // print all word
+				Set<String> keys = tm.keySet();
+				String message = "-----word list-----\n";
+				for(String k : keys) {
+					message += k + " : " + tm.get(k) + "\n";  
+				}
+				JOptionPane.showMessageDialog(null, message);
+			} else if(select.equals("4")) {
+				Set<String> keys = tm.keySet();
+				Object[] arr = keys.toArray(); 
+				int random = (int)(Math.random()*arr.length); 
+				String quiz = tm.get(arr[random]);
+				String answer = JOptionPane.showInputDialog(quiz + " ? ");
+				if(answer.equals(arr[random])){
+					JOptionPane.showMessageDialog(null, "Correct!");
+				} else {
+					JOptionPane.showMessageDialog(null, "Wrong!");
+				}
+			} else if(select.equals("5")) {
+				JOptionPane.showMessageDialog(null, "exit program");
+				return;
+			} else {
+				JOptionPane.showMessageDialog(null, "Something wrong..");
+			}
+		}
+		
+	}
+}
+
