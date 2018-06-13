@@ -40,15 +40,6 @@ int main(int argc, char *argv[]) {
 	state.MEMWB.instr = NOOPINSTRUCTION;
 	state.WBEND.instr = NOOPINSTRUCTION;
 
-    // For test
-    state.reg[1] = 36;
-    state.reg[2] = 9;
-    state.reg[3] = 12;
-    state.reg[4] = 18;
-    state.reg[5] = 7;
-    state.reg[6] = 41;
-    state.reg[7] = 22;
-    
 	while (1) {
 
 		printState(&state);
@@ -178,7 +169,21 @@ int main(int argc, char *argv[]) {
         }
 
         /* Control hazard */
+        if (EXMEM_OP == BEQ && (state.EXMEM.aluResult == 0)) {
+            newState.EXMEM.instr = NOOPINSTRUCTION;
+            newState.EXMEM.branchTarget= 0;
+            newState.EXMEM.aluResult = 0;
+            newState.EXMEM.readRegB= 0;
 
+            newState.IDEX.instr = NOOPINSTRUCTION;
+            newState.IDEX.pcPlus1 = 0;
+            newState.IDEX.readRegA = 0;
+            newState.IDEX.readRegB = 0;
+            newState.IDEX.offset = 0;
+
+            newState.IFID.instr = NOOPINSTRUCTION;
+            newState.IFID.pcPlus1 = 0;
+        }
 
 		/* --------------------- WB stage --------------------- */
 		int Wb_op = opcode(state.MEMWB.instr);
