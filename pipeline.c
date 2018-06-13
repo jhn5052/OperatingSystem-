@@ -40,6 +40,15 @@ int main(int argc, char *argv[]) {
 	state.MEMWB.instr = NOOPINSTRUCTION;
 	state.WBEND.instr = NOOPINSTRUCTION;
 
+    // For test
+    state.reg[1] = 36;
+    state.reg[2] = 9;
+    state.reg[3] = 12;
+    state.reg[4] = 18;
+    state.reg[5] = 7;
+    state.reg[6] = 41;
+    state.reg[7] = 22;
+    
 	while (1) {
 
 		printState(&state);
@@ -95,7 +104,7 @@ int main(int argc, char *argv[]) {
 
 			case BEQ:
 				if (state.EXMEM.aluResult == 0) {
-					newState.pc = state.EXMEM.branchTarget
+					newState.pc = state.EXMEM.branchTarget;
 				}
 				break;
 
@@ -120,12 +129,12 @@ int main(int argc, char *argv[]) {
 
 			case LW:
 				WB_RD = field1(state.MEMWB.instr); // rt
-				newState.reg[WB_RD] = writeData;
+				newState.reg[WB_RD] = state.MEMWB.writeData;
 				break;
 		}
 
 		newState.WBEND.instr = state.MEMWB.instr;
-		newState.WBEND.writeData = writeData;
+		newState.WBEND.writeData = state.MEMWB.writeData;
 
 		state = newState; /* this is the last statement before end of the loop.
 						  It marks the end of the cycle and updates the

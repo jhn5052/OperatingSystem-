@@ -67,3 +67,4 @@ int field0(int);
 int field1(int);
 int field2(int);
 int opcode(int);
+int ALU_OP(int, int, int, int);
