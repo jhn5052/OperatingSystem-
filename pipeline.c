@@ -116,6 +116,70 @@ int main(int argc, char *argv[]) {
 		newState.MEMWB.instr = state.EXMEM.instr;
 		newState.MEMWB.writeData = writeData;
 
+        //Ex 1st (add add)
+        //1. IFID, IDEX (opcode)  2. (IFID)field0,1 / (IDEX)field2
+        int IFID_OP = opcode(state.IFID.instr);
+        int IDEX_OP = opcode(state.IDEX.instr);
+        int EXMEM_OP = opcode(state.EXMEM.instr);
+        
+        int IFID_RegA = field0(state.IFID.instr);  
+        int IFID_RegB = field1(state.IFID.instr);
+        int IDEX_Dest = field2(state.IDEX.instr);
+        int EXMEM_Dest = field2(state.EXMEM.instr);
+
+        if ((IDEX_OP == ADD || IDEX_OP == NOR) && IFID_OP < HALT) {
+            if (IDEX_Dest == IFID_RegA) {
+                newState.IDEX.readRegA = aluResult;
+            }
+            if (IDEX_Dest == IFID_RegB && IFID_OP != LW) {
+                newState.IDEX.readRegB = aluResult;
+            }
+        }
+
+        //EX 2nd add noop add
+        if ((EXMEM_OP == ADD || EXMEM_OP == NOR) && IFID_OP < HALT) {
+            if (EXMEM_Dest == IFID_RegA) {
+                newState.IDEX.readRegA = writeData;
+            }
+            if (EXMEM_Dest == IFID_RegB && IFID_OP != LW) {
+                newState.IDEX.readRegB = writeData;
+            }
+        }
+
+
+        //MEM lw noop add
+        EXMEM_Dest = field1(state.EXMEM.instr);
+        if (EXMEM_OP == LW && IFID_OP < HALT) {
+            if (EXMEM_Dest == IFID_RegA) {
+                newState.IDEX.readRegA = writeData;
+            } 
+            if (EXMEM_Dest == IFID_RegB && IFID_OP != LW) {
+                newState.IDEX.readRegB = writeData;
+            }
+        }
+
+        
+        //MEM lw add
+        IDEX_Dest = field1(state.IDEX.instr);
+        if (IDEX_OP == LW &&  IFID_OP < HALT) {
+           if ((IDEX_Dest == IFID_RegA) || (IDEX_Dest == IFID_RegB && IFID_OP != LW)) {
+                newState.IDEX.instr = NOOPINSTRUCTION;
+                newState.IDEX.pcPlus1 = 0;
+                newState.IDEX.readRegA = 0;
+                newState.IDEX.readRegB = 0;
+                newState.IDEX.offset = 0;
+
+                newState.pc = state.pc;
+
+                newState.IFID.instr = state.IFID.instr;
+                newState.IFID.pcPlus1 = state.IFID.pcPlus1;
+           }
+
+        }
+
+        /* Control hazard */
+
+
 		/* --------------------- WB stage --------------------- */
 		int Wb_op = opcode(state.MEMWB.instr);
 		int WB_RD = -1;
@@ -135,6 +199,29 @@ int main(int argc, char *argv[]) {
 
 		newState.WBEND.instr = state.MEMWB.instr;
 		newState.WBEND.writeData = state.MEMWB.writeData;
+
+        int MEMWB_OP = opcode(state.MEMWB.instr);
+        int MEMWB_Dest = field2(state.MEMWB.instr);
+
+        //add noop noop add
+        if ((MEMWB_OP == ADD || MEMWB_OP == NOR) && IFID_OP < HALT) {
+            if (MEMWB_Dest == IFID_RegA) {
+                newState.IDEX.readRegA = state.MEMWB.writeData;
+            }
+            if (MEMWB_Dest == IFID_RegB && IFID_OP != LW) {
+                newState.IDEX.readRegB = state.MEMWB.writeData;
+            }
+        }
+
+        MEMWB_Dest = field1(state.MEMWB.instr);
+        if (MEMWB_OP == LW && IFID_OP < HALT) {
+            if (MEMWB_Dest == IFID_RegA) {
+                newState.IDEX.readRegA = state.MEMWB.writeData;
+            }
+            if (MEMWB_Dest == IFID_RegB && IFID_OP != LW) {
+                newState.IDEX.readRegB = state.MEMWB.writeData;
+            }
+        }
 
 		state = newState; /* this is the last statement before end of the loop.
 						  It marks the end of the cycle and updates the
