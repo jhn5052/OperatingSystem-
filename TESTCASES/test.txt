@@ -1,0 +1,6 @@
+start   add     1       2       3       decrement reg1
+        nor     4       5       6       goto end of program when reg1==0
+        lw      2       4       20      go back to the beginning of the loop
+        add     2       5       5
+        sw      3       7       10 
+        halt

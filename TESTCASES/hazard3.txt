@@ -1,0 +1,5 @@
+start   lw      0       3       4      decrement reg1
+        noop
+        add     3       4       5       goto end of program when reg1==0
+        halt
+        .fill   -1

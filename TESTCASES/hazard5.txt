@@ -1,0 +1,5 @@
+start   add     1       2       3       decrement reg1
+        noop
+        noop
+        add     3       4       5       goto end of program when reg1==0
+        halt
