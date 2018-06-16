@@ -1,0 +1,25 @@
+            	lw       	0        	1       	input	//r1 = 3
+            	lw       	0        	2       	neg1	//r2 = -1
+	noop
+	noop
+	noop
+	noop
+mul      	add     	1        	2        	1	//r1 = r1 + r2 (lw - add data hazard : forwarding)
+	beq    	2        	1       	done	//if r2 == r1, jump to done (control hazard)
+            	lw       	0       	3       	two	//r3 = 2
+	noop
+	noop
+	noop
+	noop
+            	add    	3        	4      	4	//r4 = r3 + r4 ( lw - add data hazard : forwarding)
+            	beq    	0        	0      	mul	//if r0 == r0, jump to mul (control hazard)
+	noop
+	noop
+	noop
+	noop
+done   	sw     	0       	4      	result	//result = r4
+            	halt
+input   	.fill   	3
+neg1   	.fill    	-1
+two     	.fill    	2
+result   	.fill   	0

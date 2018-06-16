@@ -1,0 +1,17 @@
+        	lw      	0       	1       	five    	//r1 = 5
+	lw	0 	5	negO	//r5 = -1
+	lw	0	6	stAddr	//r6 = start
+	noop
+        	noop                            
+        	add   	4       	1        	2       	//r2 = r4 + r1 (lw noop add data hazard forwarding)
+        	lw      	1       	2       	3       	//add - lw data hazard
+start   	add     	1       	2       	1       	//r1 = r1 + r2 (lw-add, add-add data hazard)
+        	add     	1       	2       	2       	//r2 += r1 (add-add data hazard)
+        	add     	2       	3       	3       	//r3 += r2 (add-add data hazard)
+       	beq     	0       	1       	2       	//control hazard 
+        	beq     	0       	0       	start   	//control hazard(go to start, if r0 == r0)
+        	noop
+done    	halt                            		end of program
+five    	.fill   	5
+negO    	.fill   	-1
+stAddr  	.fill   	start                   		will contain the address of start (2)

@@ -1,0 +1,31 @@
+       	noop                            	//This program is adding number from 0 to 7
+        	lw      0       0       zero    	//load reg0 with 0 (symbolic address)
+        	lw      0       1       one     	//load reg1 with 1 (symbolic address)
+        	lw      0       2       two   	//load reg2 with 2 (symbolic address)
+        	lw      0       3       three   	//load reg3 with 3 (symbolic address)
+        	lw      0       4       four    	//load reg4 with 4 (symbolic address)
+        	lw      0       5       five    	//load reg5 with 5 (symbolic address)
+       	lw      0       6       six     	//load reg6 with 6 (symbolic address)
+        	lw      0       7       seven   	//load reg7 with 7 (symbolic address)
+        	noop
+start  	add     0       1       1       	//reg1 += reg0 (data hazard)
+	noop
+        	add     1       2       2       	//reg2 += reg1 (data hazard)
+        	noop
+        	add     2       3       3       	//reg3 += reg2 (data hazard)
+        	add     3       4       4       	//reg4 += reg3 (data hazard)
+        	add     4       5       5       	//reg5 += reg4 (data hazard)
+        	add     5       6       6       	//reg6 += reg5 (data hazard)
+        	add     6       7       7       	//reg7 += reg6 (data hazard)
+        	sw      0       7        result  	//store reg7 to result (data hazard)
+        	noop
+done    	halt                            end of program
+zero     	.fill   0
+one      	.fill   1
+two      	.fill   2
+three    	.fill   3
+four      	.fill   4
+five      	.fill   5
+six        	.fill   6
+seven    	.fill   7
+result    	.fill   -1

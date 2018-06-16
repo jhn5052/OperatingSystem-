@@ -1,0 +1,21 @@
+	lw	0	6	negO	//r6 = -1;
+start   	add     	0       	1       	2       	//r2 = r0 + r2
+        	add     	2       	3  	5       	//r5 = r2 + r3 (add-add data hazard)
+        	lw      	0       	4       	one     	//r4 = 1
+        	add     	4       	5       	5	//r5 += r4 (lw-add data hazard) 
+        	sw      	0       	5       	two 	//(add-sw data hazard)
+        	lw      	0       	3       	three      	//r3 = 3
+        	add     	3       	5       	5     	//r5 += r3 (lw - add data hazard)
+        	add     	1       	2       	3       	//r3 = r1 + r2
+	add	3	5	5	//r5 += r3 (add - add data hazard)
+zero	beq	0	5	done	//(contol hazard)
+	add	6	5	5	//r5 += (-1)
+	beq	0	0	zero		
+done       sw	0	5	result	
+	halt
+
+negO       .fill	-1
+one	.fill	1
+two	.fill	2
+three	.fill	3
+result	.fill	5
