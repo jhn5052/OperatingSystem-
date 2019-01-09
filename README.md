@@ -1,1 +1,1 @@
-# Linux Pipeline, Linux Timer, greedy algoruthm, etc..
+# Linux minishell, Linux Pipeline, Linux Timer, greedy algorithm, etc..
