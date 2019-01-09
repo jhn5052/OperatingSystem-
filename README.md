@@ -1,1 +1,1 @@
-# for practice
+# Linux Pipeline, Linux Timer, greedy algoruthm, etc..
