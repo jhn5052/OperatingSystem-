@@ -1,1 +1,1 @@
-# Linux minishell, Linux Pipeline, Linux Timer, greedy algorithm, etc..
+make Minishell(foreground, background, redirection), Pipeline, Timer(Linux - Fedora)
